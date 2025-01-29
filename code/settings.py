@@ -7,7 +7,7 @@ WINDOW_WIDTH, WINDOW_HEIGHT = 320, 240
 TILE_SIZE = 16
 
 weapon_data = {
-    'sword': {'cooldown': 100, 'damage': 15, 'graphic': 'images/weapon/sword/full.png'}
+    'sword': {'cooldown': 100, 'damage': 35, 'graphic': 'images/weapon/sword/full.png'}
 }
 
 magic_data = {
@@ -34,7 +34,7 @@ monster_data = {
         'attack_sound': 'audio/attack/claw.wav',
         'speed': 30,
         'resistance': 3,
-        'attack_radius': 16,
+        'attack_radius': 32,
         'notice_radius': 64}
 }
 

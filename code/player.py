@@ -32,7 +32,7 @@ class Player(Entity):
 
 
         #stats
-        self.stats = {'health': 100, 'energy': 60, 'attack': 10, 'magic': 4, 'speed': 60}
+        self.stats = {'health': 100, 'energy': 60, 'attack': 10, 'magic': 4, 'speed': 120}
         self.health = self.stats['health'] * 0.5
         self.energy = self.stats['energy']
         self.exp = 123
@@ -74,7 +74,7 @@ class Player(Entity):
         current_time = pygame.time.get_ticks()
 
         if self.attacking:
-            if current_time - self.attack_time >= self.attack_cooldown:
+            if current_time - self.attack_time >= self.attack_cooldown + weapon_data[self.weapon]['cooldown']:
                 self.attacking = False
                 self.killWeapon()
 
@@ -98,6 +98,12 @@ class Player(Entity):
         #animate
         self.frame_index += self.animation_speed * dt if self.direction else 0
         self.image = self.frames[self.state][int(self.frame_index) % len(self.frames[self.state])]
+
+    def getFullWeaponDamage(self):
+        baseDamage = self.stats['attack']
+        weaponDamage = weapon_data[self.weapon]['damage']
+
+        return baseDamage + weaponDamage
 
     def update(self, dt):
         self.input()

@@ -32,6 +32,8 @@ class Game:
         # Groups
         self.all_sprites = AllSprites(self.virtual_surface)
         self.collision_sprites = pygame.sprite.Group()
+        self.attack_sprites = pygame.sprite.Group()
+        self.attackable_sprites = pygame.sprite.Group()
 
         # Setup
         self.setup()
@@ -69,12 +71,21 @@ class Game:
                                      self.killWeapon,
                                      self.create_magic)
             elif mark.name == 'Enemy':
-                Enemy('bamboo', (mark.x, mark.y), (self.all_sprites), self.collision_sprites)
+                Enemy('bamboo', (mark.x, mark.y), [self.all_sprites, self.attackable_sprites], self.collision_sprites)
             elif mark.name == 'Boss':
-                Enemy('boss1', (mark.x, mark.y), (self.all_sprites), self.collision_sprites)
+                Enemy('boss1', (mark.x, mark.y), [self.all_sprites, self.attackable_sprites], self.collision_sprites)
 
     def create_attack(self):
-        self.current_weapon = Weapon(self.player, self.all_sprites)
+        self.current_weapon = Weapon(self.player, [self.all_sprites, self.attack_sprites])
+
+    def player_attack(self):
+        if self.attack_sprites:
+            for attack_sprite in self.attack_sprites:
+                collision_sprites = pygame.sprite.spritecollide(attack_sprite, self.attackable_sprites, False)
+                if collision_sprites:
+                    for target_sprite in collision_sprites:
+                        if target_sprite.sprite_type == 'enemy':
+                            target_sprite.getDamage(self.player, attack_sprite.sprite_type)
 
     def create_magic(self, style, strength, cost):
         print(style, strength, cost)
@@ -94,6 +105,7 @@ class Game:
             # Update
             self.all_sprites.update(dt)
             self.all_sprites.enemy_update(self.player)
+            self.player_attack()
 
 
             # Virtuális képernyőre rajzolás
@@ -101,7 +113,7 @@ class Game:
             self.all_sprites.draw(self.player.rect.center)
 
             # for sprite in self.all_sprites:
-            #     if hasattr(sprite, 'hitbox'):
+            #     if hasattr(sprite, 'sprite_type'):
             #         # Hozz létre egy másolatot a hitbox-ról és alkalmazd az offset-et
             #         offset_hitbox = sprite.hitbox.move(self.all_sprites.offset)
             #         pygame.draw.rect(self.virtual_surface, (255, 0, 0), offset_hitbox, 2)
