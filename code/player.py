@@ -1,16 +1,17 @@
 from settings import *
+from entity import Entity
 
-class Player(pygame.sprite.Sprite):
+class Player(Entity):
     def __init__(self, pos, groups, collision, create_attack, killWeapon, create_magic):
         super().__init__(groups)
         self.load_images()
-        self.state, self.frame_index = 'down', 0
+        self.state = 'down'
         self.image = pygame.image.load(join('images', 'player', 'down', '1.png')).convert_alpha()
         self.rect = self.image.get_frect(center=pos)
-        self.hitbox = self.rect.inflate(0, -15)
+        self.hitbox = self.rect.inflate(0, -14)
+        self.pos = pygame.Vector2(self.rect.center)
 
         #movement
-        self.direction = pygame.Vector2()
         self.collision_sprites = collision
 
         #attack
@@ -31,7 +32,7 @@ class Player(pygame.sprite.Sprite):
 
 
         #stats
-        self.stats = {'health': 100, 'energy': 60, 'attack': 10, 'magic': 4, 'speed': 80}
+        self.stats = {'health': 100, 'energy': 60, 'attack': 10, 'magic': 4, 'speed': 60}
         self.health = self.stats['health'] * 0.5
         self.energy = self.stats['energy']
         self.exp = 123
@@ -77,23 +78,6 @@ class Player(pygame.sprite.Sprite):
                 self.attacking = False
                 self.killWeapon()
 
-    def move(self, dt):
-        self.hitbox.x += self.direction.x * self.speed * dt
-        self.collision('horizontal')
-        self.hitbox.y += self.direction.y * self.speed * dt
-        self.collision('vertical')
-        self.rect.center = self.hitbox.center
-
-    def collision(self, direction):
-        for sprite in self.collision_sprites:
-            if sprite.rect.colliderect(self.hitbox):
-                if direction == 'horizontal':
-                    if self.direction.x > 0: self.hitbox.right = sprite.rect.left
-                    if self.direction.x < 0: self.hitbox.left = sprite.rect.right
-                if direction == 'vertical':
-                    if self.direction.y > 0: self.hitbox.bottom = sprite.rect.top
-                    if self.direction.y < 0: self.hitbox.top = sprite.rect.bottom
-
     def getState(self):
         return self.state.split('_')[0]
     def animate(self, dt):
@@ -112,7 +96,7 @@ class Player(pygame.sprite.Sprite):
                 self.state = self.state.replace('_attack', '')
 
         #animate
-        self.frame_index += 5 * dt if self.direction else 0
+        self.frame_index += self.animation_speed * dt if self.direction else 0
         self.image = self.frames[self.state][int(self.frame_index) % len(self.frames[self.state])]
 
     def update(self, dt):

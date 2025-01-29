@@ -14,6 +14,30 @@ magic_data = {
     'fire': {'strength': 20, 'cost': 20, 'graphic': 'images/particles/fire/2.png'}
 }
 
+monster_data = {
+    'bamboo': {
+        'health': 100,
+        'coin': 10,
+        'damage': 20,
+        'attack_type': 'claw',
+        'attack_sound': 'audio/attack/claw.wav',
+        'speed': 30,  # Próbáld ezt az értéket
+        'resistance': 3,
+        'attack_radius': 16,
+        'notice_radius': 64
+    },
+    'boss1': {
+        'health': 100,
+        'coin': 10,
+        'damage': 20,
+        'attack_type': 'claw',
+        'attack_sound': 'audio/attack/claw.wav',
+        'speed': 30,
+        'resistance': 3,
+        'attack_radius': 16,
+        'notice_radius': 64}
+}
+
 #ui
 BAR_HEIGHT = 20
 HEALTH_BAR_WIDTH = 200

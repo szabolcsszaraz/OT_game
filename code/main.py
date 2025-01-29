@@ -4,6 +4,7 @@ from sprites import CollisionSprites, Sprite
 from groups import AllSprites
 from weapon import Weapon
 from ui import UI
+from enemy import Enemy
 from random import randint
 
 
@@ -67,6 +68,10 @@ class Game:
                                      self.create_attack,
                                      self.killWeapon,
                                      self.create_magic)
+            elif mark.name == 'Enemy':
+                Enemy('bamboo', (mark.x, mark.y), (self.all_sprites), self.collision_sprites)
+            elif mark.name == 'Boss':
+                Enemy('boss1', (mark.x, mark.y), (self.all_sprites), self.collision_sprites)
 
     def create_attack(self):
         self.current_weapon = Weapon(self.player, self.all_sprites)
@@ -88,11 +93,18 @@ class Game:
 
             # Update
             self.all_sprites.update(dt)
+            self.all_sprites.enemy_update(self.player)
 
 
             # Virtuális képernyőre rajzolás
             self.virtual_surface.fill('grey')
             self.all_sprites.draw(self.player.rect.center)
+
+            # for sprite in self.all_sprites:
+            #     if hasattr(sprite, 'hitbox'):
+            #         # Hozz létre egy másolatot a hitbox-ról és alkalmazd az offset-et
+            #         offset_hitbox = sprite.hitbox.move(self.all_sprites.offset)
+            #         pygame.draw.rect(self.virtual_surface, (255, 0, 0), offset_hitbox, 2)
 
             # Virtuális képernyő felskálázása a valódi képernyőre
             scaled_surface = pygame.transform.scale(self.virtual_surface, (self.window_width, self.window_height))
