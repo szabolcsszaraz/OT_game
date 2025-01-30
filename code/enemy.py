@@ -1,12 +1,15 @@
 
 from settings import *
 from entity import Entity
+from coin import Coin
 
 class Enemy(Entity):
-    def __init__(self, monster_name, pos, groups, collision_sprite, damage_player, trigger_death_anim):
+    def __init__(self, monster_name, pos, groups, collision_sprite, damage_player, trigger_death_anim, coin_sprites):
         # Eredeti inicializáció megtartása
         super().__init__(groups)
         self.sprite_type = 'enemy'
+        self.all_sprites = groups[0]
+        self.coin_sprites = coin_sprites
 
         # Grafika beállítása
         self.import_graphics(monster_name)
@@ -31,7 +34,7 @@ class Enemy(Entity):
         self.resistance = monster_info['resistance']
         self.attack_radius = monster_info['attack_radius']
         self.notice_radius = monster_info['notice_radius']
-        self.coins = monster_info['coin']
+        self.coin_value = monster_info['coin']
 
         #player interaction
         self.can_attack = True
@@ -142,7 +145,11 @@ class Enemy(Entity):
             self.kill()
             self.trigger_death_anim(self.rect.center, self.monster_name)
             self.death_sound.play()
+            self.drop_coins()
 
+
+    def drop_coins(self):
+        Coin(self.rect.center, self.coin_value, [self.all_sprites,self.coin_sprites])
 
     def update(self, dt):
         self.hitReaction()
@@ -154,6 +161,6 @@ class Enemy(Entity):
 
     def enemy_update(self, player):
         self.get_status(player)
-        self.actions(player)  # CSAK A FRISSÍTÉS, NINCS UPDATE HIVÁS
+        self.actions(player)
 
 

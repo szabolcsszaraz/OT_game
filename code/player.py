@@ -2,9 +2,10 @@ from settings import *
 from entity import Entity
 
 class Player(Entity):
-    def __init__(self, pos, groups, collision, create_attack, killWeapon, create_magic):
+    def __init__(self, pos, groups, collision, create_attack, killWeapon, create_magic, coin_sprites):
         super().__init__(groups)
         self.load_images()
+        self.sprite_type = 'player'
         self.state = 'down'
         self.image = pygame.image.load(join('images', 'player', 'down', '1.png')).convert_alpha()
         self.rect = self.image.get_frect(center=pos)
@@ -36,7 +37,7 @@ class Player(Entity):
         self.max_health = self.stats['health']
         self.health = self.stats['health']
         self.energy = self.stats['energy']
-        self.exp = 123
+        self.coins = 0
         self.speed = self.stats['speed']
 
         #damage timer
@@ -44,9 +45,14 @@ class Player(Entity):
         self.hurt_time = None
         self.invulnerability_dur = 500
 
+        #coin
+        self.coin_sprites = coin_sprites
+
         #import sound
         self.weapon_sound = pygame.mixer.Sound('audio/attack/Sword.wav')
         self.weapon_sound.set_volume(0.2)
+        self.coin_sound = pygame.mixer.Sound('audio/Coin.wav')
+        self.coin_sound.set_volume(0.2)
     def load_images(self):
         self.frames = {'left': [], 'right': [], 'up': [], 'down': [],
                        'left_attack': [], 'right_attack': [], 'up_attack': [], 'down_attack': []}
@@ -135,9 +141,22 @@ class Player(Entity):
         else:
             self.energy = self.stats['energy']
 
+    def collect_coins(self, dt):
+        # Ütközésdetektálás a coin_sprites csoporttal
+        collided_coins = pygame.sprite.spritecollide(
+            self,
+            self.coin_sprites,
+            True,
+            pygame.sprite.collide_rect  # Rect alapú ütközés
+        )
+        for coin in collided_coins:
+            self.coins += coin.value
+            self.coin_sound.play()
+
     def update(self, dt):
         self.input()
         self.move(dt)
         self.animate(dt)
         self.cooldowns()
         self.stamina(dt)
+        self.collect_coins(dt)

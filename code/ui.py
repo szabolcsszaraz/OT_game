@@ -70,7 +70,7 @@ class UI:
         self.show_bar(player.health, player.stats['health'], self.health_bar_rect, HEALTH_COLOR)
         self.show_bar(player.energy, player.stats['energy'], self.energy_bar_rect, ENERGY_COLOR)
 
-        self.show_coin(player.exp)
+        self.show_coin(player.coins)
         self.weapon_overlay(player.weapon_index)
 
         self.magic_overlay(player.magic_index)

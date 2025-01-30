@@ -36,6 +36,7 @@ class Game:
         self.collision_sprites = pygame.sprite.Group()
         self.attack_sprites = pygame.sprite.Group()
         self.attackable_sprites = pygame.sprite.Group()
+        self.coin_sprites = pygame.sprite.Group()
 
         # Setup
         self.setup()
@@ -71,11 +72,12 @@ class Game:
                                      self.collision_sprites,
                                      self.create_attack,
                                      self.killWeapon,
-                                     self.create_magic)
+                                     self.create_magic,
+                                     self.coin_sprites)
             elif mark.name == 'Enemy':
-                Enemy('bamboo', (mark.x, mark.y), [self.all_sprites, self.attackable_sprites], self.collision_sprites, self.damage_player, self.trigger_death_anim)
+                Enemy('bamboo', (mark.x, mark.y), [self.all_sprites, self.attackable_sprites], self.collision_sprites, self.damage_player, self.trigger_death_anim, self.coin_sprites)
             elif mark.name == 'Boss':
-                Enemy('boss1', (mark.x, mark.y), [self.all_sprites, self.attackable_sprites], self.collision_sprites, self.damage_player, self.trigger_death_anim)
+                Enemy('boss1', (mark.x, mark.y), [self.all_sprites, self.attackable_sprites], self.collision_sprites, self.damage_player, self.trigger_death_anim, self.coin_sprites)
 
     def create_attack(self):
         self.current_weapon = Weapon(self.player, [self.all_sprites, self.attack_sprites])

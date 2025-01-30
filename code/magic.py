@@ -25,7 +25,7 @@ class Magic:
         if player.energy >= cost:
             self.sounds['fire'].play()
             self.sounds['fire'].set_volume(0.2)
-            # player.energy -= cost
+            player.energy -= cost
 
             if direction == 'right':
                 dir = pygame.Vector2(1,0)
