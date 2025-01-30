@@ -43,6 +43,10 @@ class Player(Entity):
         self.vulnerable = True
         self.hurt_time = None
         self.invulnerability_dur = 500
+
+        #import sound
+        self.weapon_sound = pygame.mixer.Sound('audio/attack/Sword.wav')
+        self.weapon_sound.set_volume(0.2)
     def load_images(self):
         self.frames = {'left': [], 'right': [], 'up': [], 'down': [],
                        'left_attack': [], 'right_attack': [], 'up_attack': [], 'down_attack': []}
@@ -67,6 +71,7 @@ class Player(Entity):
                 self.attacking = True
                 self.attack_time = pygame.time.get_ticks()
                 self.create_attack()
+                self.weapon_sound.play()
 
             if mouse_button[2]:
                 self.attacking = True

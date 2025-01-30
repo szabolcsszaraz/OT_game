@@ -18,8 +18,8 @@ weapon_data = {
 }
 
 magic_data = {
-    'fire': {'strength': 20, 'cost': 10, 'graphic': 'images/particles/fire/2.png'},
-    'heal': {'strength': 20, 'cost': 10, 'graphic': 'images/particles/heal/3.png'}
+    'fire': {'strength': 10, 'cost': 20, 'graphic': 'images/particles/fire/2.png'},
+    'heal': {'strength': 20, 'cost': 30, 'graphic': 'images/particles/heal/3.png'}
 }
 
 monster_data = {
