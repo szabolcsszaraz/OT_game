@@ -5,6 +5,8 @@ from groups import AllSprites
 from weapon import Weapon
 from ui import UI
 from enemy import Enemy
+from particles import AnimationPlayer
+from magic import Magic
 from random import randint
 
 
@@ -71,9 +73,9 @@ class Game:
                                      self.killWeapon,
                                      self.create_magic)
             elif mark.name == 'Enemy':
-                Enemy('bamboo', (mark.x, mark.y), [self.all_sprites, self.attackable_sprites], self.collision_sprites, self.damage_player)
+                Enemy('bamboo', (mark.x, mark.y), [self.all_sprites, self.attackable_sprites], self.collision_sprites, self.damage_player, self.trigger_death_anim)
             elif mark.name == 'Boss':
-                Enemy('boss1', (mark.x, mark.y), [self.all_sprites, self.attackable_sprites], self.collision_sprites, self.damage_player)
+                Enemy('boss1', (mark.x, mark.y), [self.all_sprites, self.attackable_sprites], self.collision_sprites, self.damage_player, self.trigger_death_anim)
 
     def create_attack(self):
         self.current_weapon = Weapon(self.player, [self.all_sprites, self.attack_sprites])
@@ -92,10 +94,16 @@ class Game:
             self.player.health -= amount
             self.player.vulnerable = False
             self.player.hurt_time = pygame.time.get_ticks()
-            #particles
+            self.animation_player.create_particles(attack_type,self.player.rect.center,self.all_sprites)
+
+    def trigger_death_anim(self, pos, particle_type):
+        self.animation_player.create_particles(particle_type, pos, self.all_sprites)
 
     def create_magic(self, style, strength, cost):
-        print(style, strength, cost)
+        if style == 'heal':
+            self.magic_player.heal(self.player, strength, cost, [self.all_sprites])
+        if style == 'fire':
+            self.magic_player.flame(self.player, cost, [self.all_sprites, self.attack_sprites])
     def killWeapon(self):
         if self.current_weapon:
             self.current_weapon.kill()
@@ -129,6 +137,10 @@ class Game:
             scaled_surface = pygame.transform.scale(self.virtual_surface, (self.window_width, self.window_height))
             self.display_surface.blit(scaled_surface, (0, 0))
             self.ui.display(self.player)
+
+            #particles
+            self.animation_player = AnimationPlayer()
+            self.magic_player = Magic(self.animation_player)
 
             # Frissítés
             pygame.display.update()

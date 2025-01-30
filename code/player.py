@@ -16,7 +16,7 @@ class Player(Entity):
 
         #attack
         self.attacking = False
-        self.attack_cooldown = 500
+        self.attack_cooldown = 800
         self.attack_time = None
 
         #weapon
@@ -33,7 +33,8 @@ class Player(Entity):
 
         #stats
         self.stats = {'health': 100, 'energy': 60, 'attack': 10, 'magic': 4, 'speed': 120}
-        self.health = self.stats['health'] * 0.5
+        self.max_health = self.stats['health']
+        self.health = self.stats['health']
         self.energy = self.stats['energy']
         self.exp = 123
         self.speed = self.stats['speed']
@@ -53,7 +54,6 @@ class Player(Entity):
                         full_path = join(folder_path, file_name)
                         surf = pygame.image.load(full_path).convert_alpha()
                         self.frames[state].append(surf)
-
     def input(self):
         keys = pygame.key.get_pressed()
         mouse_button = pygame.mouse.get_pressed()
@@ -85,7 +85,6 @@ class Player(Entity):
         if not self.vulnerable:
             if current_time - self.hurt_time >= self.invulnerability_dur:
                 self.vulnerable = True
-
     def getState(self):
         return self.state.split('_')[0]
     def animate(self, dt):
@@ -119,8 +118,21 @@ class Player(Entity):
 
         return baseDamage + weaponDamage
 
+    def getFullMagicDamage(self):
+        baseDamage = self.stats['magic']
+        spellDamage = magic_data[self.magic]['strength']
+
+        return baseDamage + spellDamage
+
+    def stamina(self, dt):
+        if self.energy < self.stats['energy']:
+            self.energy += 1 * dt
+        else:
+            self.energy = self.stats['energy']
+
     def update(self, dt):
         self.input()
         self.move(dt)
         self.animate(dt)
         self.cooldowns()
+        self.stamina(dt)

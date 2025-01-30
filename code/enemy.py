@@ -3,7 +3,7 @@ from settings import *
 from entity import Entity
 
 class Enemy(Entity):
-    def __init__(self, monster_name, pos, groups, collision_sprite, damage_player):
+    def __init__(self, monster_name, pos, groups, collision_sprite, damage_player, trigger_death_anim):
         # Eredeti inicializáció megtartása
         super().__init__(groups)
         self.sprite_type = 'enemy'
@@ -23,6 +23,7 @@ class Enemy(Entity):
         # Monster adatok beállítása
         self.monster_name = monster_name
         monster_info = monster_data[self.monster_name]
+        self.max_health = monster_info['health']
         self.health = monster_info['health']
         self.speed = monster_info['speed']
         self.damage = monster_info['damage']
@@ -37,6 +38,7 @@ class Enemy(Entity):
         self.attack_time = None
         self.attack_cooldown = 3000
         self.damage_player = damage_player
+        self.trigger_death_anim = trigger_death_anim
 
         #timer for kill
         self.vulnerable = True
@@ -119,11 +121,8 @@ class Enemy(Entity):
         if self.vulnerable:
             if attack_type == 'weapon':
                 self.health -= player.getFullWeaponDamage()
-
-
             else:
-                pass
-                #magic
+                self.health -= player.getFullMagicDamage()
             self.hitTime = pygame.time.get_ticks()
             self.vulnerable = False
 
@@ -133,6 +132,7 @@ class Enemy(Entity):
     def check_death(self):
         if self.health <= 0:
             self.kill()
+            self.trigger_death_anim(self.rect.center, self.monster_name)
 
 
     def update(self, dt):
