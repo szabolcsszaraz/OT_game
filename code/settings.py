@@ -22,7 +22,7 @@ monster_data = {
         'attack_type': 'claw',
         'attack_sound': 'audio/attack/claw.wav',
         'speed': 30,  # Próbáld ezt az értéket
-        'resistance': 3,
+        'resistance': 20,
         'attack_radius': 16,
         'notice_radius': 64
     },

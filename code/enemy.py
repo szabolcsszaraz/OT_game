@@ -3,7 +3,7 @@ from settings import *
 from entity import Entity
 
 class Enemy(Entity):
-    def __init__(self, monster_name, pos, groups, collision_sprite):
+    def __init__(self, monster_name, pos, groups, collision_sprite, damage_player):
         # Eredeti inicializáció megtartása
         super().__init__(groups)
         self.sprite_type = 'enemy'
@@ -26,6 +26,7 @@ class Enemy(Entity):
         self.health = monster_info['health']
         self.speed = monster_info['speed']
         self.damage = monster_info['damage']
+        self.attack_type = monster_info['attack_type']
         self.resistance = monster_info['resistance']
         self.attack_radius = monster_info['attack_radius']
         self.notice_radius = monster_info['notice_radius']
@@ -35,6 +36,7 @@ class Enemy(Entity):
         self.can_attack = True
         self.attack_time = None
         self.attack_cooldown = 3000
+        self.damage_player = damage_player
 
         #timer for kill
         self.vulnerable = True
@@ -68,6 +70,7 @@ class Enemy(Entity):
     def actions(self, player):
         if self.state == 'attack':
             self.attack_time = pygame.time.get_ticks()
+            self.damage_player(self.damage, self.attack_type)
         elif self.state == 'walk':
             self.direction = self.player_distance_direction(player)[1]
         else:
@@ -97,6 +100,12 @@ class Enemy(Entity):
         self.image = animation[int(self.frame_index)]
         self.rect = self.image.get_rect(center=self.pos)
 
+        if not self.vulnerable:
+            alpha = self.waveVal()
+            self.image.set_alpha(alpha)
+        else:
+            self.image.set_alpha(255)
+
     def cooldown(self):
         current_time = pygame.time.get_ticks()
         if not self.can_attack:
@@ -110,17 +119,24 @@ class Enemy(Entity):
         if self.vulnerable:
             if attack_type == 'weapon':
                 self.health -= player.getFullWeaponDamage()
+
+
             else:
                 pass
                 #magic
             self.hitTime = pygame.time.get_ticks()
             self.vulnerable = False
+
+    def hitReaction(self):
+        if not self.vulnerable:
+            self.direction *= -self.resistance
     def check_death(self):
         if self.health <= 0:
             self.kill()
 
 
     def update(self, dt):
+        self.hitReaction()
         self.move(dt)
         self.animate(dt)
         self.cooldown()

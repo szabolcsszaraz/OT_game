@@ -71,9 +71,9 @@ class Game:
                                      self.killWeapon,
                                      self.create_magic)
             elif mark.name == 'Enemy':
-                Enemy('bamboo', (mark.x, mark.y), [self.all_sprites, self.attackable_sprites], self.collision_sprites)
+                Enemy('bamboo', (mark.x, mark.y), [self.all_sprites, self.attackable_sprites], self.collision_sprites, self.damage_player)
             elif mark.name == 'Boss':
-                Enemy('boss1', (mark.x, mark.y), [self.all_sprites, self.attackable_sprites], self.collision_sprites)
+                Enemy('boss1', (mark.x, mark.y), [self.all_sprites, self.attackable_sprites], self.collision_sprites, self.damage_player)
 
     def create_attack(self):
         self.current_weapon = Weapon(self.player, [self.all_sprites, self.attack_sprites])
@@ -86,6 +86,13 @@ class Game:
                     for target_sprite in collision_sprites:
                         if target_sprite.sprite_type == 'enemy':
                             target_sprite.getDamage(self.player, attack_sprite.sprite_type)
+
+    def damage_player(self, amount, attack_type):
+        if self.player.vulnerable:
+            self.player.health -= amount
+            self.player.vulnerable = False
+            self.player.hurt_time = pygame.time.get_ticks()
+            #particles
 
     def create_magic(self, style, strength, cost):
         print(style, strength, cost)

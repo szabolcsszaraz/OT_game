@@ -37,6 +37,11 @@ class Player(Entity):
         self.energy = self.stats['energy']
         self.exp = 123
         self.speed = self.stats['speed']
+
+        #damage timer
+        self.vulnerable = True
+        self.hurt_time = None
+        self.invulnerability_dur = 500
     def load_images(self):
         self.frames = {'left': [], 'right': [], 'up': [], 'down': [],
                        'left_attack': [], 'right_attack': [], 'up_attack': [], 'down_attack': []}
@@ -77,6 +82,9 @@ class Player(Entity):
             if current_time - self.attack_time >= self.attack_cooldown + weapon_data[self.weapon]['cooldown']:
                 self.attacking = False
                 self.killWeapon()
+        if not self.vulnerable:
+            if current_time - self.hurt_time >= self.invulnerability_dur:
+                self.vulnerable = True
 
     def getState(self):
         return self.state.split('_')[0]
@@ -99,6 +107,12 @@ class Player(Entity):
         self.frame_index += self.animation_speed * dt if self.direction else 0
         self.image = self.frames[self.state][int(self.frame_index) % len(self.frames[self.state])]
 
+        #flicker
+        if not self.vulnerable:
+            alpha = self.waveVal()
+            self.image.set_alpha(alpha)
+        else:
+            self.image.set_alpha(255)
     def getFullWeaponDamage(self):
         baseDamage = self.stats['attack']
         weaponDamage = weapon_data[self.weapon]['damage']
