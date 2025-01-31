@@ -1,7 +1,9 @@
 
 from settings import *
 from entity import Entity
-from coin import Coin
+from pickups import Coin, Health, MagicPickup
+import random
+
 
 class Enemy(Entity):
     def __init__(self, monster_name, pos, groups, collision_sprite, damage_player, trigger_death_anim, coin_sprites):
@@ -145,11 +147,18 @@ class Enemy(Entity):
             self.kill()
             self.trigger_death_anim(self.rect.center, self.monster_name)
             self.death_sound.play()
-            self.drop_coins()
+            self.drop_loot()
 
 
-    def drop_coins(self):
-        Coin(self.rect.center, self.coin_value, [self.all_sprites,self.coin_sprites])
+    def drop_loot(self):
+        # 70% esély érme, 20% élet, 10% varázslat
+        rand = random.random()
+        if rand < 0.1:
+            Coin(self.rect.center, self.coin_value, [self.all_sprites, self.coin_sprites])
+        elif rand < 0.5:
+            Health(self.rect.center, 1, [self.all_sprites, self.coin_sprites])
+        else:
+            MagicPickup(self.rect.center, 1, [self.all_sprites, self.coin_sprites])
 
     def update(self, dt):
         self.hitReaction()

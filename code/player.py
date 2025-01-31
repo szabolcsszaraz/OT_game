@@ -1,5 +1,6 @@
 from settings import *
 from entity import Entity
+from pickups import Coin, Health, MagicPickup
 
 class Player(Entity):
     def __init__(self, pos, groups, collision, create_attack, killWeapon, create_magic, coin_sprites):
@@ -175,17 +176,24 @@ class Player(Entity):
         else:
             self.energy = self.stats['energy']
 
-    def collect_coins(self, dt):
-        # Ütközésdetektálás a coin_sprites csoporttal
-        collided_coins = pygame.sprite.spritecollide(
+    def collect_pickups(self, dt):
+        collided_pickups = pygame.sprite.spritecollide(
             self,
             self.coin_sprites,
             True,
-            pygame.sprite.collide_rect  # Rect alapú ütközés
+            pygame.sprite.collide_rect
         )
-        for coin in collided_coins:
-            self.coins += coin.value
-            self.coin_sound.play()
+
+        for pickup in collided_pickups:
+            if isinstance(pickup, Coin):
+                self.coins += pickup.value
+                self.coin_sound.play()
+            elif isinstance(pickup, Health):
+                self.available_magics['heal'] += pickup.value
+                self.coin_sound.play()
+            elif isinstance(pickup, MagicPickup):
+                self.available_magics['fire'] += pickup.value
+                self.coin_sound.play()
 
     def try_use_magic(self, style, strength, cost):
         # Csak akkor engedj varázsolni, ha van töltés
@@ -201,4 +209,4 @@ class Player(Entity):
         self.animate(dt)
         self.cooldowns()
         self.stamina(dt)
-        self.collect_coins(dt)
+        self.collect_pickups(dt)

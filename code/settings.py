@@ -43,7 +43,13 @@ monster_data = {
         'speed': 30,
         'resistance': 2,
         'attack_radius': 32,
-        'notice_radius': 120}
+        'notice_radius': 120,
+        'loot_chances': {
+            'coin': 0.7,
+            'health': 0.2,
+            'magic': 0.1
+        }
+    }
 }
 
 #ui
