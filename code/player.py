@@ -24,12 +24,16 @@ class Player(Entity):
         self.create_attack = create_attack
         self.weapon_index = 0
         self.weapon = list(weapon_data.keys())[self.weapon_index]
+        self.available_weapons = ['sword']
         self.killWeapon = killWeapon
 
         #magic
         self.create_magic = create_magic
         self.magic_index = 0
         self.magic = list(magic_data.keys())[self.magic_index]
+        self.available_magics = {'fire': 3, 'heal': 1}
+        self.magic_switch_cooldown = 200
+        self.last_magic_switch_time = 0
 
 
         #stats
@@ -66,6 +70,7 @@ class Player(Entity):
                         self.frames[state].append(surf)
     def input(self):
         keys = pygame.key.get_pressed()
+        current_time = pygame.time.get_ticks()
         mouse_button = pygame.mouse.get_pressed()
         if not self.attacking:
             self.direction.x = int(keys[pygame.K_d]) - int(keys[pygame.K_a])
@@ -80,12 +85,38 @@ class Player(Entity):
                 self.weapon_sound.play()
 
             if mouse_button[2]:
-                self.attacking = True
-                self.attack_time = pygame.time.get_ticks()
-                style = list(magic_data.keys())[self.magic_index]
-                strength = list(magic_data.values())[self.magic_index]['strength'] + self.stats['magic']
-                cost = list(magic_data.values())[self.magic_index]['cost']
-                self.create_magic(style, strength, cost)
+                if self.magic is not None:  # Only if magic available
+                    self.attacking = True
+                    self.attack_time = pygame.time.get_ticks()
+                    style = self.magic
+                    strength = magic_data[style]['strength'] + self.stats['magic']
+                    cost = magic_data[style]['cost']
+
+                    if self.try_use_magic(style, strength, cost):
+                        self.attacking = True
+                    else:
+                        self.attacking = False
+                else:
+                    self.attacking = False
+
+            if keys[pygame.K_q]:
+                self.weapon_index = (self.weapon_index + 1) % len(self.available_weapons)
+                self.weapon = self.available_weapons[self.weapon_index]
+
+            if keys[pygame.K_e]:
+                if current_time - self.last_magic_switch_time > self.magic_switch_cooldown:
+                    self.last_magic_switch_time = current_time
+                    all_magics = list(self.available_magics.keys())
+
+                    if all_magics:
+                        try:
+                            current_idx = all_magics.index(self.magic)
+                            new_idx = (current_idx + 1) % len(all_magics)
+                        except ValueError:
+                            new_idx = 0
+
+                        self.magic = all_magics[new_idx]
+                        self.magic_index = new_idx
     def cooldowns(self):
         current_time = pygame.time.get_ticks()
 
@@ -130,6 +161,9 @@ class Player(Entity):
         return baseDamage + weaponDamage
 
     def getFullMagicDamage(self):
+        if self.magic is None:
+            return 0  # default value
+
         baseDamage = self.stats['magic']
         spellDamage = magic_data[self.magic]['strength']
 
@@ -152,6 +186,14 @@ class Player(Entity):
         for coin in collided_coins:
             self.coins += coin.value
             self.coin_sound.play()
+
+    def try_use_magic(self, style, strength, cost):
+        # Csak akkor engedj varázsolni, ha van töltés
+        if self.available_magics.get(style, 0) > 0 and self.energy >= cost:
+            self.available_magics[style] -= 1
+            self.create_magic(style, strength, cost)
+            return True
+        return False
 
     def update(self, dt):
         self.input()

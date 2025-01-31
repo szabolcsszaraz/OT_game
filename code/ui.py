@@ -60,12 +60,36 @@ class UI:
         weapon_rect = weapon_surf.get_rect(center = gb_rect.center)
         self.display_surface.blit(weapon_surf, weapon_rect)
 
-    def magic_overlay(self, magic_index,):
+    def magic_overlay(self, magic_index, player):
+        # Mindig mutasd a kiválasztott varázslatot, még ha elfogyott is
+        if not player.magic:
+            return
+
+        current_magic = player.magic
+        count = player.available_magics.get(current_magic, 0)
+
         gb_rect = self.selection_box(80, 635)
-        magic = self.magic_graphics[magic_index]
+
+        # Varázslat ikon
+        try:
+            magic_idx = list(magic_data.keys()).index(current_magic)
+            magic = self.magic_graphics[magic_idx]
+        except ValueError:
+            return
+
         magic_surf = pygame.transform.scale(magic, (20, 40))
         magic_rect = magic_surf.get_rect(center=gb_rect.center)
         self.display_surface.blit(magic_surf, magic_rect)
+
+        # Mennyiség szám (0 is megjelenik)
+        text_surf = self.font.render(str(count), True, TEXT_COLOR)
+        text_rect = text_surf.get_rect(bottomright=gb_rect.bottomright - pygame.Vector2(5, 5))
+        self.display_surface.blit(text_surf, text_rect)
+        if pygame.time.get_ticks() - player.last_magic_switch_time < player.magic_switch_cooldown:
+            cooldown_alpha = 150
+            overlay = pygame.Surface((gb_rect.width, gb_rect.height), pygame.SRCALPHA)
+            overlay.fill((0, 0, 0, cooldown_alpha))
+            self.display_surface.blit(overlay, gb_rect)
     def display(self, player):
         self.show_bar(player.health, player.stats['health'], self.health_bar_rect, HEALTH_COLOR)
         self.show_bar(player.energy, player.stats['energy'], self.energy_bar_rect, ENERGY_COLOR)
@@ -73,4 +97,9 @@ class UI:
         self.show_coin(player.coins)
         self.weapon_overlay(player.weapon_index)
 
-        self.magic_overlay(player.magic_index)
+        self.magic_overlay(player.magic_index, player)
+
+        if player.energy < 20:  # 20 energia alatt figyelmeztetés
+            warning_surf = self.font.render("LOW ENERGY!", True, (255, 0, 0))
+            warning_rect = warning_surf.get_rect(center=(self.display_surface.get_width() // 2, 50))
+            self.display_surface.blit(warning_surf, warning_rect)

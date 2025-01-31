@@ -104,7 +104,7 @@ class Game:
     def create_magic(self, style, strength, cost):
         if style == 'heal':
             self.magic_player.heal(self.player, strength, cost, [self.all_sprites])
-        if style == 'fire':
+        elif style == 'fire':
             self.magic_player.flame(self.player, cost, [self.all_sprites, self.attack_sprites])
     def killWeapon(self):
         if self.current_weapon:
