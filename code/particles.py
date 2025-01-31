@@ -15,6 +15,7 @@ class AnimationPlayer:
             'boss1': self.import_folder('images/particles/boss1')
         }
 
+
     def create_particles(self, animation_type, pos, group):
         animation_frames = self.frames[animation_type]
         ParticleEffect(pos, animation_frames, group)

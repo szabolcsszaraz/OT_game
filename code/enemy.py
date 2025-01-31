@@ -153,9 +153,9 @@ class Enemy(Entity):
     def drop_loot(self):
         # 70% esély érme, 20% élet, 10% varázslat
         rand = random.random()
-        if rand < 0.1:
+        if rand < 0.7:
             Coin(self.rect.center, self.coin_value, [self.all_sprites, self.coin_sprites])
-        elif rand < 0.5:
+        elif rand < 0.9:
             Health(self.rect.center, 1, [self.all_sprites, self.coin_sprites])
         else:
             MagicPickup(self.rect.center, 1, [self.all_sprites, self.coin_sprites])
@@ -166,6 +166,9 @@ class Enemy(Entity):
         self.animate(dt)
         self.cooldown()
         self.check_death()
+
+        if self.health <= 0:
+            self.health = 0
 
 
     def enemy_update(self, player):

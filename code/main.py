@@ -1,3 +1,5 @@
+import sys
+
 from settings import *
 from player import Player
 from sprites import CollisionSprites, Sprite
@@ -47,7 +49,7 @@ class Game:
 
 
     def setup(self):
-        map = load_pygame(join('data', 'maps', 'basic.tmx'))
+        map = load_pygame(join('data', 'maps', 'world.tmx'))
 
         for x, y, image in map.get_layer_by_name('Ground').tiles():
             Sprite((x * TILE_SIZE, y * TILE_SIZE), image, (self.all_sprites))
@@ -59,7 +61,7 @@ class Game:
             # CollisionSprites létrehozása a megfelelő méretű képpel
             CollisionSprites((obj.x, obj.y), scaled_image, (self.all_sprites, self.collision_sprites))
 
-        for x,y,image in map.get_layer_by_name('Plants and rocks').tiles():
+        for x,y,image in map.get_layer_by_name('Buildings').tiles():
             CollisionSprites((x*TILE_SIZE, y*TILE_SIZE), image, (self.all_sprites))
 
         for obj in map.get_layer_by_name('Collisions'):
@@ -74,7 +76,7 @@ class Game:
                                      self.killWeapon,
                                      self.create_magic,
                                      self.coin_sprites)
-            elif mark.name == 'Enemy':
+            elif mark.name == 'Bamboo':
                 Enemy('bamboo', (mark.x, mark.y), [self.all_sprites, self.attackable_sprites], self.collision_sprites, self.damage_player, self.trigger_death_anim, self.coin_sprites)
             elif mark.name == 'Boss':
                 Enemy('boss1', (mark.x, mark.y), [self.all_sprites, self.attackable_sprites], self.collision_sprites, self.damage_player, self.trigger_death_anim, self.coin_sprites)
@@ -97,6 +99,9 @@ class Game:
             self.player.vulnerable = False
             self.player.hurt_time = pygame.time.get_ticks()
             self.animation_player.create_particles(attack_type,self.player.rect.center,self.all_sprites)
+            hit_sound = pygame.mixer.Sound(f'audio/attack/{attack_type}.wav')
+            hit_sound.set_volume(0.2)
+            hit_sound.play()
 
     def trigger_death_anim(self, pos, particle_type):
         self.animation_player.create_particles(particle_type, pos, self.all_sprites)
@@ -110,6 +115,14 @@ class Game:
         if self.current_weapon:
             self.current_weapon.kill()
         self.current_weapon = None
+
+    def handle_death(self):
+        # Halál animáció és UI frissítés
+        self.ui.display_death()
+        pygame.display.update()
+        pygame.time.wait(2000)  # 2 másodperc várakozás
+        self.running = False
+
     def run(self):
         while self.running:
             # Delta time
@@ -124,16 +137,14 @@ class Game:
             self.all_sprites.enemy_update(self.player)
             self.player_attack()
 
+            # death chceck
+            if self.player.health <= 0:
+                self.handle_death()
+
 
             # Virtuális képernyőre rajzolás
             self.virtual_surface.fill('grey')
             self.all_sprites.draw(self.player.rect.center)
-
-            # for sprite in self.all_sprites:
-            #     if hasattr(sprite, 'sprite_type'):
-            #         # Hozz létre egy másolatot a hitbox-ról és alkalmazd az offset-et
-            #         offset_hitbox = sprite.hitbox.move(self.all_sprites.offset)
-            #         pygame.draw.rect(self.virtual_surface, (255, 0, 0), offset_hitbox, 2)
 
             # Virtuális képernyő felskálázása a valódi képernyőre
             scaled_surface = pygame.transform.scale(self.virtual_surface, (self.window_width, self.window_height))
@@ -148,6 +159,7 @@ class Game:
             pygame.display.update()
 
         pygame.quit()
+        sys.exit()
 
 if __name__ == '__main__':
     game = Game()

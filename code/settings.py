@@ -28,22 +28,20 @@ monster_data = {
         'coin': 10,
         'damage': 20,
         'attack_type': 'cut',
-        'attack_sound': 'audio/attack/claw.wav',
         'speed': 30,  # Próbáld ezt az értéket
         'resistance': 5,
         'attack_radius': 16,
-        'notice_radius': 64
+        'notice_radius': 120
     },
     'boss1': {
         'health': 400,
         'coin': 100,
         'damage': 50,
         'attack_type': 'slashdouble',
-        'attack_sound': 'audio/attack/claw.wav',
         'speed': 30,
         'resistance': 2,
         'attack_radius': 32,
-        'notice_radius': 120,
+        'notice_radius': 100,
         'loot_chances': {
             'coin': 0.7,
             'health': 0.2,

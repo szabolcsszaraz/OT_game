@@ -90,6 +90,12 @@ class UI:
             overlay = pygame.Surface((gb_rect.width, gb_rect.height), pygame.SRCALPHA)
             overlay.fill((0, 0, 0, cooldown_alpha))
             self.display_surface.blit(overlay, gb_rect)
+
+    def display_death(self):
+        death_text = self.font.render("YOU DIED!", True, (255, 0, 0))
+        text_rect = death_text.get_rect(center=(self.display_surface.get_width() // 2,
+                                                self.display_surface.get_height() // 2))
+        self.display_surface.blit(death_text, text_rect)
     def display(self, player):
         self.show_bar(player.health, player.stats['health'], self.health_bar_rect, HEALTH_COLOR)
         self.show_bar(player.energy, player.stats['energy'], self.energy_bar_rect, ENERGY_COLOR)
