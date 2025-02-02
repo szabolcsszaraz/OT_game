@@ -38,7 +38,7 @@ class Player(Entity):
 
 
         #stats
-        self.stats = {'health': 100, 'energy': 60, 'attack': 10, 'magic': 4, 'speed': 120}
+        self.stats = {'health': 100, 'energy': 60, 'attack': 10, 'magic': 4, 'speed': 85}
         self.max_health = self.stats['health']
         self.health = self.stats['health']
         self.energy = self.stats['energy']
@@ -149,6 +149,8 @@ class Player(Entity):
         self.frame_index += self.animation_speed * dt if self.direction else 0
         self.image = self.frames[self.state][int(self.frame_index) % len(self.frames[self.state])]
 
+        self.update_mask()
+
         #flicker
         if not self.vulnerable:
             alpha = self.waveVal()
@@ -202,6 +204,19 @@ class Player(Entity):
             self.create_magic(style, strength, cost)
             return True
         return False
+
+    def check_pixel_collision(self):
+        for sprite in self.collision_sprites:
+            if sprite.sprite_type == 'enemy':
+                offset_x = sprite.rect.x - self.rect.x
+                offset_y = sprite.rect.y - self.rect.y
+                if self.mask.overlap(sprite.mask, (offset_x, offset_y)):
+                    return True
+        return False
+
+    def move(self, dt):
+        super().move(dt)  # Szülőosztály move metódusának hívása
+        self.check_pixel_collision()  # Csak a játékos ellenőriz
 
     def update(self, dt):
         self.input()

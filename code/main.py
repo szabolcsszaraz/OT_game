@@ -80,6 +80,20 @@ class Game:
                 Enemy('bamboo', (mark.x, mark.y), [self.all_sprites, self.attackable_sprites], self.collision_sprites, self.damage_player, self.trigger_death_anim, self.coin_sprites)
             elif mark.name == 'Boss':
                 Enemy('boss1', (mark.x, mark.y), [self.all_sprites, self.attackable_sprites], self.collision_sprites, self.damage_player, self.trigger_death_anim, self.coin_sprites)
+            elif mark.name == 'Beast':
+                Enemy('beast', (mark.x, mark.y), [self.all_sprites, self.attackable_sprites], self.collision_sprites, self.damage_player, self.trigger_death_anim, self.coin_sprites)
+            elif mark.name == 'Flame':
+                Enemy('flame', (mark.x, mark.y), [self.all_sprites, self.attackable_sprites], self.collision_sprites, self.damage_player, self.trigger_death_anim, self.coin_sprites)
+            elif mark.name == 'Mushroom':
+                Enemy('mushroom', (mark.x, mark.y), [self.all_sprites, self.attackable_sprites], self.collision_sprites, self.damage_player, self.trigger_death_anim, self.coin_sprites)
+            elif mark.name == 'Knight':
+                Enemy('knight', (mark.x, mark.y), [self.all_sprites, self.attackable_sprites], self.collision_sprites, self.damage_player, self.trigger_death_anim, self.coin_sprites)
+            elif mark.name == 'Gladiator':
+                Enemy('gladiator', (mark.x, mark.y), [self.all_sprites, self.attackable_sprites], self.collision_sprites, self.damage_player, self.trigger_death_anim, self.coin_sprites)
+            elif mark.name == 'Skeleton':
+                Enemy('skeleton', (mark.x, mark.y), [self.all_sprites, self.attackable_sprites], self.collision_sprites, self.damage_player, self.trigger_death_anim, self.coin_sprites)
+            elif mark.name == 'Skeletondemon':
+                Enemy('skeletondemon', (mark.x, mark.y), [self.all_sprites, self.attackable_sprites], self.collision_sprites, self.damage_player, self.trigger_death_anim, self.coin_sprites)
 
     def create_attack(self):
         self.current_weapon = Weapon(self.player, [self.all_sprites, self.attack_sprites])
@@ -87,11 +101,17 @@ class Game:
     def player_attack(self):
         if self.attack_sprites:
             for attack_sprite in self.attack_sprites:
-                collision_sprites = pygame.sprite.spritecollide(attack_sprite, self.attackable_sprites, False)
+                collision_sprites = pygame.sprite.spritecollide(
+                    attack_sprite,
+                    self.attackable_sprites,
+                    False,
+                    pygame.sprite.collide_mask  # Pixel-perfect ütközés
+                )
                 if collision_sprites:
                     for target_sprite in collision_sprites:
                         if target_sprite.sprite_type == 'enemy':
                             target_sprite.getDamage(self.player, attack_sprite.sprite_type)
+
 
     def damage_player(self, amount, attack_type):
         if self.player.vulnerable:

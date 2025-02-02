@@ -44,6 +44,7 @@ class Enemy(Entity):
         self.attack_cooldown = 3000
         self.damage_player = damage_player
         self.trigger_death_anim = trigger_death_anim
+        self.update_mask()
 
         #timer for kill
         self.vulnerable = True
@@ -112,6 +113,7 @@ class Enemy(Entity):
             self.frame_index = 0
 
         self.image = animation[int(self.frame_index)]
+        self.update_mask()
         self.rect = self.image.get_rect(center=self.pos)
 
         if not self.vulnerable:
@@ -153,9 +155,9 @@ class Enemy(Entity):
     def drop_loot(self):
         # 70% esély érme, 20% élet, 10% varázslat
         rand = random.random()
-        if rand < 0.7:
+        if rand < 0.4:
             Coin(self.rect.center, self.coin_value, [self.all_sprites, self.coin_sprites])
-        elif rand < 0.9:
+        elif rand < 0.7:
             Health(self.rect.center, 1, [self.all_sprites, self.coin_sprites])
         else:
             MagicPickup(self.rect.center, 1, [self.all_sprites, self.coin_sprites])

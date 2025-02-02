@@ -12,7 +12,14 @@ class AnimationPlayer:
             'slashdouble': self.import_folder('images/particles/slashdouble'),
             # enemy death
             'bamboo': self.import_folder('images/particles/bamboo'),
-            'boss1': self.import_folder('images/particles/boss1')
+            'boss1': self.import_folder('images/particles/boss1'),
+            'beast': self.import_folder('images/particles/beast'),
+            'flame': self.import_folder('images/particles/flame'),
+            'mushroom': self.import_folder('images/particles/mushroom'),
+            'knight': self.import_folder('images/particles/knight'),
+            'gladiator': self.import_folder('images/particles/gladiator'),
+            'skeleton': self.import_folder('images/particles/skeleton'),
+            'skeletondemon': self.import_folder('images/particles/skeleton')
         }
 
 

@@ -8,6 +8,7 @@ class Entity(pygame.sprite.Sprite):
         self.animation_speed = 5
         self.direction = pygame.Vector2()
         self.pos = pygame.Vector2()  # Valós pozíció
+        self.mask = None
 
 
     def move(self, dt):
@@ -23,6 +24,7 @@ class Entity(pygame.sprite.Sprite):
 
         # 3. Rect frissítése a HITBOX pozíciójából (ne a pos-ból!)
         self.rect.center = self.hitbox.center
+
 
     def collision(self, direction):
         for sprite in self.collision_sprites:
@@ -44,6 +46,9 @@ class Entity(pygame.sprite.Sprite):
                         self.hitbox.top = sprite.hitbox.bottom
                         self.pos.y = self.hitbox.centery
                     self.direction.y = 0
+
+    def update_mask(self):
+        self.mask = pygame.mask.from_surface(self.image)
 
     def waveVal(self):
         value = sin(pygame.time.get_ticks())
