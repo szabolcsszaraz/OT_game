@@ -1,7 +1,7 @@
 # 🧙 Arcane Trials - Mage Survival  
 
 <p align="center">
-  <img src="(https://github.com/szabolcsszaraz/OT_game/blob/main/images/at.png)" alt="Arcane Trials">
+  <img src="https://github.com/szabolcsszaraz/OT_game/blob/main/images/at.png" alt="Arcane Trials">
   <br>
   <em>Ukážka hry - Boj proti davom skeletov</em>
 </p>
