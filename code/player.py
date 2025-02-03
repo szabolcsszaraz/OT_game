@@ -86,7 +86,7 @@ class Player(Entity):
                 self.weapon_sound.play()
 
             if mouse_button[2]:
-                if self.magic is not None:  # Only if magic available
+                if self.magic is not None:  # Iba ak je k dispozícii mágia
                     self.attacking = True
                     self.attack_time = pygame.time.get_ticks()
                     style = self.magic
@@ -198,7 +198,7 @@ class Player(Entity):
                 self.coin_sound.play()
 
     def try_use_magic(self, style, strength, cost):
-        # Csak akkor engedj varázsolni, ha van töltés
+        # pracovať s mágiou ked je nabity
         if self.available_magics.get(style, 0) > 0 and self.energy >= cost:
             self.available_magics[style] -= 1
             self.create_magic(style, strength, cost)
@@ -215,8 +215,8 @@ class Player(Entity):
         return False
 
     def move(self, dt):
-        super().move(dt)  # Szülőosztály move metódusának hívása
-        self.check_pixel_collision()  # Csak a játékos ellenőriz
+        super().move(dt)  # Volanie metódy move parent triedy
+        self.check_pixel_collision()
 
     def update(self, dt):
         self.input()

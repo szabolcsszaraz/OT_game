@@ -1,111 +1,116 @@
 from settings import *
 
 class UI:
-    def __init__(self):
-        #general
-        self.display_surface = pygame.display.get_surface()
-        self.font = pygame.font.SysFont(None, 20)
+    def __init__(self, virtual_surface):
+        self.virtual_surface = virtual_surface
+        self.font = pygame.font.Font(UI_FONT, 8)
 
-        #bar setup
-        self.health_bar_rect = pygame.Rect(10, 10, HEALTH_BAR_WIDTH, BAR_HEIGHT)
-        self.energy_bar_rect = pygame.Rect(10, 31, ENERGY_BAR_WIDTH, BAR_HEIGHT)
+        # Bar setup
+        self.health_bar_rect = pygame.Rect(5, 3, HEALTH_BAR_WIDTH, BAR_HEIGHT)
+        self.energy_bar_rect = pygame.Rect(5, 12, ENERGY_BAR_WIDTH, BAR_HEIGHT)
 
-        #convert weapon dic
+        # Previesť slovník zbraní
         self.weapon_graphics = []
         for weapon in weapon_data.values():
             path = weapon['graphic']
             weapon = pygame.image.load(path).convert_alpha()
+            weapon = pygame.transform.scale(weapon, (12, 20))
             self.weapon_graphics.append(weapon)
 
         self.magic_graphics = []
         for magic in magic_data.values():
             path = magic['graphic']
             magic = pygame.image.load(path).convert_alpha()
+            magic = pygame.transform.scale(magic, (12, 20))
             self.magic_graphics.append(magic)
 
     def show_bar(self, current, max, bg_rect, color):
-        pygame.draw.rect(self.display_surface, UI_BG_COLOR, bg_rect)
+        # Kreslenie pozadia
+        pygame.draw.rect(self.virtual_surface, UI_BG_COLOR, bg_rect)
 
-        #convert
+        # Výpočet aktuálnej hodnoty
         ratio = current / max
         current_width = bg_rect.width * ratio
         current_rect = bg_rect.copy()
         current_rect.width = current_width
 
-        #draw the bar
-        pygame.draw.rect(self.display_surface, color, current_rect)
-        pygame.draw.rect(self.display_surface, UI_BORDER_COLOR, bg_rect, 3)
+        # Bar kreslenie
+        pygame.draw.rect(self.virtual_surface, color, current_rect)
+        pygame.draw.rect(self.virtual_surface, UI_BORDER_COLOR, bg_rect, 2)
 
-    def show_coin(self, exp):
-        text_surf = self.font.render('coins: ' + str(int(exp)), False, TEXT_COLOR)
-        x = self.display_surface.get_width() - 20
-        y = self.display_surface.get_height() - 20
-        text_rect = text_surf.get_rect(bottomright = (x,y))
+    def show_coin(self, coins):
+        # Zobraziť mince
+        text_surf = self.font.render('Coins: ' + str(int(coins)), False, TEXT_COLOR)
+        x = self.virtual_surface.get_width() - 10
+        y = self.virtual_surface.get_height() - 10
+        text_rect = text_surf.get_rect(bottomright=(x, y))
 
-        pygame.draw.rect(self.display_surface, UI_BG_COLOR, text_rect.inflate(20,20))
-        self.display_surface.blit(text_surf, text_rect)
-        pygame.draw.rect(self.display_surface, UI_BG_COLOR, text_rect.inflate(20, 20), 3)
+        pygame.draw.rect(self.virtual_surface, UI_BG_COLOR, text_rect.inflate(1, 1))
+        self.virtual_surface.blit(text_surf, text_rect)
+        pygame.draw.rect(self.virtual_surface, UI_BORDER_COLOR, text_rect.inflate(1, 1), 1)
 
     def selection_box(self, left, top):
+        # Kreslenie výberového poľa
         bg_rect = pygame.Rect(left, top, ITEM_BOX_SIZE, ITEM_BOX_SIZE)
-        pygame.draw.rect(self.display_surface, UI_BG_COLOR, bg_rect)
-        pygame.draw.rect(self.display_surface, UI_BORDER_COLOR, bg_rect, 3)
-
+        pygame.draw.rect(self.virtual_surface, UI_BG_COLOR, bg_rect)
+        pygame.draw.rect(self.virtual_surface, UI_BORDER_COLOR, bg_rect, 2)
         return bg_rect
 
     def weapon_overlay(self, weapon_index):
-        gb_rect = self.selection_box(10, 630)
+        # Kreslenie ikony zbrane
+        bg_rect = self.selection_box(5, self.virtual_surface.get_height() - 35)
         weapon = self.weapon_graphics[weapon_index]
-        weapon_surf = pygame.transform.scale(weapon, (20,40))
-        weapon_rect = weapon_surf.get_rect(center = gb_rect.center)
-        self.display_surface.blit(weapon_surf, weapon_rect)
+        weapon_rect = weapon.get_rect(center=bg_rect.center)
+        self.virtual_surface.blit(weapon, weapon_rect)
 
     def magic_overlay(self, magic_index, player):
-        # Mindig mutasd a kiválasztott varázslatot, még ha elfogyott is
+        # Kreslenie ikony magie
         if not player.magic:
             return
 
         current_magic = player.magic
         count = player.available_magics.get(current_magic, 0)
 
-        gb_rect = self.selection_box(80, 635)
+        bg_rect = self.selection_box(29, self.virtual_surface.get_height() - 31)
 
-        # Varázslat ikon
         try:
             magic_idx = list(magic_data.keys()).index(current_magic)
             magic = self.magic_graphics[magic_idx]
         except ValueError:
             return
 
-        magic_surf = pygame.transform.scale(magic, (20, 40))
-        magic_rect = magic_surf.get_rect(center=gb_rect.center)
-        self.display_surface.blit(magic_surf, magic_rect)
+        magic_rect = magic.get_rect(center=bg_rect.center)
+        self.virtual_surface.blit(magic, magic_rect)
 
-        # Mennyiség szám (0 is megjelenik)
+        # Číslo množstva
         text_surf = self.font.render(str(count), True, TEXT_COLOR)
-        text_rect = text_surf.get_rect(bottomright=gb_rect.bottomright - pygame.Vector2(5, 5))
-        self.display_surface.blit(text_surf, text_rect)
+        text_rect = text_surf.get_rect(bottomright=bg_rect.bottomright - pygame.Vector2(2, 2))
+        self.virtual_surface.blit(text_surf, text_rect)
+
+        # Prekrytie funkcie Cooldown
         if pygame.time.get_ticks() - player.last_magic_switch_time < player.magic_switch_cooldown:
             cooldown_alpha = 150
-            overlay = pygame.Surface((gb_rect.width, gb_rect.height), pygame.SRCALPHA)
+            overlay = pygame.Surface((bg_rect.width, bg_rect.height), pygame.SRCALPHA)
             overlay.fill((0, 0, 0, cooldown_alpha))
-            self.display_surface.blit(overlay, gb_rect)
+            self.virtual_surface.blit(overlay, bg_rect)
 
     def display_death(self):
+        # Text o smrti
         death_text = self.font.render("YOU DIED!", True, (255, 0, 0))
-        text_rect = death_text.get_rect(center=(self.display_surface.get_width() // 2,
-                                                self.display_surface.get_height() // 2))
-        self.display_surface.blit(death_text, text_rect)
+        text_rect = death_text.get_rect(center=(self.virtual_surface.get_width() // 2,
+                                               self.virtual_surface.get_height() // 2))
+        self.virtual_surface.blit(death_text, text_rect)
+
     def display(self, player):
+        # vykreslenie vsetky UI elementy
         self.show_bar(player.health, player.stats['health'], self.health_bar_rect, HEALTH_COLOR)
         self.show_bar(player.energy, player.stats['energy'], self.energy_bar_rect, ENERGY_COLOR)
-
         self.show_coin(player.coins)
         self.weapon_overlay(player.weapon_index)
-
         self.magic_overlay(player.magic_index, player)
 
-        if player.energy < 20:  # 20 energia alatt figyelmeztetés
+        # varovanie
+        if player.energy < 20:
             warning_surf = self.font.render("LOW ENERGY!", True, (255, 0, 0))
-            warning_rect = warning_surf.get_rect(center=(self.display_surface.get_width() // 2, 50))
-            self.display_surface.blit(warning_surf, warning_rect)
+            warning_rect = warning_surf.get_rect(center=(self.virtual_surface.get_width() // 2, 50))
+            self.virtual_surface.blit(warning_surf, warning_rect)

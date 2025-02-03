@@ -7,22 +7,21 @@ class Entity(pygame.sprite.Sprite):
         self.frame_index = 0
         self.animation_speed = 5
         self.direction = pygame.Vector2()
-        self.pos = pygame.Vector2()  # Valós pozíció
+        self.pos = pygame.Vector2()  # Skutočná pozícia
         self.mask = None
 
 
     def move(self, dt):
-        # 1. Mozgás a valós pozícióban
         self.pos.x += self.direction.x * self.speed * dt
         self.pos.y += self.direction.y * self.speed * dt
 
-        # 2. Hitbox frissítése a valós pozíció alapján
+        # Aktualizácia Hitboxu na základe skutočnej polohy
         self.hitbox.centerx = self.pos.x
-        self.collision("horizontal")  # Horizontális ütközés ellenőrzés
+        self.collision("horizontal")
         self.hitbox.centery = self.pos.y
-        self.collision("vertical")  # Vertikális ütközés ellenőrzés
+        self.collision("vertical")
 
-        # 3. Rect frissítése a HITBOX pozíciójából (ne a pos-ból!)
+        #Aktualizácia Rekta z pozície HITBOX (nie z pozície!)
         self.rect.center = self.hitbox.center
 
 

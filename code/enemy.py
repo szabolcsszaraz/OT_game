@@ -7,25 +7,25 @@ import random
 
 class Enemy(Entity):
     def __init__(self, monster_name, pos, groups, collision_sprite, damage_player, trigger_death_anim, coin_sprites):
-        # Eredeti inicializáció megtartása
+        # Zachovanie pôvodnej inicializácie
         super().__init__(groups)
         self.sprite_type = 'enemy'
         self.all_sprites = groups[0]
         self.coin_sprites = coin_sprites
 
-        # Grafika beállítása
+        # Nastavenie grafiky
         self.import_graphics(monster_name)
         self.state = 'idle'
         self.image = self.frames[self.state][self.frame_index]
 
 
-        # Pozícionálás
+        # Polohovanie
         self.rect = self.image.get_rect(topleft=pos)
-        self.hitbox = self.rect.inflate(0, -10)  # Kisebb hitbox a jobb mozgásért
+        self.hitbox = self.rect.inflate(0, -10)  # Menší hitbox pre lepší pohyb
         self.collision_sprites = collision_sprite
         self.pos = pygame.Vector2(self.rect.center)
 
-        # Monster adatok beállítása
+        # Nastavenie údajov o príšerách
         self.monster_name = monster_name
         monster_info = monster_data[self.monster_name]
         self.max_health = monster_info['health']
@@ -46,7 +46,7 @@ class Enemy(Entity):
         self.trigger_death_anim = trigger_death_anim
         self.update_mask()
 
-        #timer for kill
+        #časovač na zabitie
         self.vulnerable = True
         self.hitTime = None
         self.invicible_duration = 300
@@ -153,7 +153,7 @@ class Enemy(Entity):
 
 
     def drop_loot(self):
-        # 70% esély érme, 20% élet, 10% varázslat
+        # 40% esély érme, 30% élet, 30% varázslat
         rand = random.random()
         if rand < 0.4:
             Coin(self.rect.center, self.coin_value, [self.all_sprites, self.coin_sprites])

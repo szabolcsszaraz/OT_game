@@ -9,7 +9,7 @@ from ui import UI
 from enemy import Enemy
 from particles import AnimationPlayer
 from magic import Magic
-from random import randint
+from menu import Menu
 
 
 class Game:
@@ -17,22 +17,31 @@ class Game:
         # Setup
         pygame.init()
 
-        # Virtuális felbontás és valódi képernyő felbontása
+        # Virtuálne rozlíšenie a skutočné rozlíšenie obrazovky
         self.virtual_width = WINDOW_WIDTH
         self.virtual_height = WINDOW_HEIGHT
-        self.window_width = 1080  # Nagyobb ablakméret (változtatható)
+        self.window_width = 1080
         self.window_height = 720
 
-        # Képernyő inicializálása
+        # Inicializácia obrazovky
         self.display_surface = pygame.display.set_mode((self.window_width, self.window_height))
-        pygame.display.set_caption('Szabi')
+        pygame.display.set_caption('Arcane Trials 🏹')
 
-        # Virtuális felület
+        # Virtuálne rozhranie
         self.virtual_surface = pygame.Surface((self.virtual_width, self.virtual_height))
 
         self.clock = pygame.time.Clock()
         self.running = True
+        self.current_state = 'menu'
 
+        # Inicializácia menu
+        self.menu = Menu(self)
+
+        # Inicializácia hry
+        self.init_game()
+
+
+    def init_game(self):
         # Groups
         self.all_sprites = AllSprites(self.virtual_surface)
         self.collision_sprites = pygame.sprite.Group()
@@ -42,12 +51,20 @@ class Game:
 
         # Setup
         self.setup()
-        self.ui = UI()
+        self.ui = UI(self.virtual_surface)
 
-        # Attack
+        # attack
         self.current_weapon = None
 
+        # particles
+        self.animation_player = AnimationPlayer()
+        self.magic_player = Magic(self.animation_player)
 
+
+
+    def start_game(self):
+        self.current_state = 'playing'
+        self.init_game()  # Spustenie novej hry
     def setup(self):
         map = load_pygame(join('data', 'maps', 'world.tmx'))
 
@@ -55,10 +72,10 @@ class Game:
             Sprite((x * TILE_SIZE, y * TILE_SIZE), image, (self.all_sprites))
 
         for obj in map.get_layer_by_name('Objects'):
-            # Az objektum méretének átméretezése
+            # Zmena veľkosti objektu
             scaled_image = pygame.transform.scale(obj.image, (int(obj.width), int(obj.height)))
 
-            # CollisionSprites létrehozása a megfelelő méretű képpel
+            # Vytvorenie CollisionSprites so správnou veľkosťou obrazu
             CollisionSprites((obj.x, obj.y), scaled_image, (self.all_sprites, self.collision_sprites))
 
         for x,y,image in map.get_layer_by_name('Buildings').tiles():
@@ -105,7 +122,7 @@ class Game:
                     attack_sprite,
                     self.attackable_sprites,
                     False,
-                    pygame.sprite.collide_mask  # Pixel-perfect ütközés
+                    pygame.sprite.collide_mask  # Pixel-perfect collision
                 )
                 if collision_sprites:
                     for target_sprite in collision_sprites:
@@ -137,46 +154,47 @@ class Game:
         self.current_weapon = None
 
     def handle_death(self):
-        # Halál animáció és UI frissítés
+        self.current_state = 'menu'
         self.ui.display_death()
         pygame.display.update()
-        pygame.time.wait(2000)  # 2 másodperc várakozás
-        self.running = False
+        pygame.time.wait(2000)
 
     def run(self):
         while self.running:
-            # Delta time
             dt = self.clock.tick(60) / 1000
 
+            # Event handling
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
                     self.running = False
 
-            # Update
-            self.all_sprites.update(dt)
-            self.all_sprites.enemy_update(self.player)
-            self.player_attack()
+                if event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
+                    self.menu.handle_event(event)
 
-            # death chceck
-            if self.player.health <= 0:
-                self.handle_death()
+            # Aktualizácie stavu
+            if self.current_state == 'playing':
+                self.all_sprites.update(dt)
+                self.all_sprites.enemy_update(self.player)
+                self.player_attack()
 
+                if self.player.health <= 0:
+                    self.handle_death()
 
-            # Virtuális képernyőre rajzolás
+            # Vykreslenie
             self.virtual_surface.fill('grey')
-            self.all_sprites.draw(self.player.rect.center)
 
-            # Virtuális képernyő felskálázása a valódi képernyőre
-            scaled_surface = pygame.transform.scale(self.virtual_surface, (self.window_width, self.window_height))
+            if self.current_state == 'playing':
+                self.all_sprites.draw(self.player.rect.center)
+                self.ui.display(self.player)
+
+            self.menu.draw()
+
+            # Scale to window
+            scaled_surface = pygame.transform.scale(self.virtual_surface,
+                                                    (self.window_width, self.window_height))
             self.display_surface.blit(scaled_surface, (0, 0))
-            self.ui.display(self.player)
-
-            #particles
-            self.animation_player = AnimationPlayer()
-            self.magic_player = Magic(self.animation_player)
-
-            # Frissítés
             pygame.display.update()
+
 
         pygame.quit()
         sys.exit()

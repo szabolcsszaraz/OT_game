@@ -10,7 +10,7 @@ TILE_SIZE = 16
 HP_BAR_WIDTH = 20
 HP_BAR_HEIGHT = 3
 HP_BAR_OFFSET = 6
-HP_BAR_BORDER_COLOR = (40, 40, 40)  # Sötét szürke keret
+HP_BAR_BORDER_COLOR = (40, 40, 40)  # Tmavosivý rám
 HP_BAR_BORDER_SIZE = 1
 
 weapon_data = {
@@ -116,10 +116,11 @@ monster_data = {
 }
 
 #ui
-BAR_HEIGHT = 20
-HEALTH_BAR_WIDTH = 200
-ENERGY_BAR_WIDTH = 140
-ITEM_BOX_SIZE = 80
+BAR_HEIGHT = 8
+HEALTH_BAR_WIDTH = 80
+ENERGY_BAR_WIDTH = 60
+ITEM_BOX_SIZE = 30
+UI_FONT = 'data/font/SourGummy_Expanded-ExtraLight.ttf'
 
 #colors
 WATER_COLOR = '#71ddee'
