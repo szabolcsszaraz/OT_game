@@ -40,6 +40,10 @@ class Game:
         # Inicializácia hry
         self.init_game()
 
+        #music
+        pygame.mixer.init()
+        self.load_music()
+
 
     def init_game(self):
         # Groups
@@ -64,6 +68,7 @@ class Game:
 
     def start_game(self):
         self.current_state = 'playing'
+        pygame.mixer.music.play(-1)
         self.init_game()  # Spustenie novej hry
     def setup(self):
         map = load_pygame(join('data', 'maps', 'world.tmx'))
@@ -158,6 +163,13 @@ class Game:
         self.ui.display_death()
         pygame.display.update()
         pygame.time.wait(2000)
+
+    def load_music(self):
+        try:
+            pygame.mixer.music.load('audio/Chill.ogg')
+            pygame.mixer.music.set_volume(0.1)
+        except Exception as e:
+            print(f"Error: {e}")
 
     def run(self):
         while self.running:
