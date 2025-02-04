@@ -4,9 +4,9 @@ class Menu:
     def __init__(self, game):
         self.game = game
         self.virtual_surface = game.virtual_surface
-        self.font = pygame.font.Font(UI_FONT, 12)  # Vbeľkosť písma
-        self.title_font = pygame.font.Font(UI_FONT, 16)  # Veľkosť názvu
-        self.instructions_font = pygame.font.Font(UI_FONT, 12)
+        self.font = pygame.font.SysFont('Sans', 12)  # Vbeľkosť písma
+        self.title_font = pygame.font.SysFont('Sans', 16)  # Veľkosť názvu
+        self.instructions_font = pygame.font.SysFont('Sans', 12)
         self.buttons = []
         self.init_menu()
 
