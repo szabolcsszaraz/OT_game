@@ -1,5 +1,4 @@
 import sys
-
 from settings import *
 from player import Player
 from sprites import CollisionSprites, Sprite
