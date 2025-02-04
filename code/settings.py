@@ -120,7 +120,7 @@ BAR_HEIGHT = 8
 HEALTH_BAR_WIDTH = 80
 ENERGY_BAR_WIDTH = 60
 ITEM_BOX_SIZE = 30
-UI_FONT = 'data/font/SourGummy_Expanded-ExtraLight.ttf'
+# UI_FONT = 'data/font/SourGummy_Expanded-ExtraLight.ttf'
 
 #colors
 WATER_COLOR = '#71ddee'

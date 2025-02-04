@@ -3,7 +3,7 @@ from settings import *
 class UI:
     def __init__(self, virtual_surface):
         self.virtual_surface = virtual_surface
-        self.font = pygame.font.Font(UI_FONT, 8)
+        self.font = pygame.font.SysFont('Sans', 8)
 
         # Bar setup
         self.health_bar_rect = pygame.Rect(5, 3, HEALTH_BAR_WIDTH, BAR_HEIGHT)
